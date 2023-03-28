@@ -1,12 +1,20 @@
+/*
+Covid 19 Data Exploration 
+Skills used: Joins, Temp Tables, Aggregate Functions, Creating Views, Converting Data Types (cast, convert)
+*/
+
 select *
 from PortfolioProject..CovidDeaths
 where continent is not null
 order by 3,4
 
---select *
---from PortfolioProject..CovidVaccinations
---order by 3,4
+select *
+from PortfolioProject..CovidVaccinations
+order by 3,4
 
+
+
+-- Select Data to be starting with
 
 select location, date, total_cases, new_cases, total_deaths, population
 from PortfolioProject..CovidDeaths
@@ -17,6 +25,7 @@ order by 1,2
 
 
 --- Looking at Total Cases vs Total Deaths
+-- Shows likelihood of dying if contracted covid by country
 
 select location, date, total_cases, total_deaths, (convert (numeric(18,2), total_deaths)/convert (numeric(18,2), total_cases))*100 as DeathPercentage
 from PortfolioProject..CovidDeaths
@@ -64,7 +73,6 @@ order by TotalDeathCount desc
 
 -- Breaking down by continent
 
-
 -- Showing the continents with the highest death count per population
 
 select continent, MAX(cast(total_deaths as int)) as TotalDeathCount
@@ -89,6 +97,7 @@ order by 1,2
 
 
 -- Looking at Total Populations vs Vaccinations
+-- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
 select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
 , sum(cast(vac.new_vaccinations as bigint)) over (Partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
@@ -101,28 +110,9 @@ order by 2,3
 
 
 
---Using CTE
-
-With PopvsVac (Continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
-as
-(
-select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
-, sum(cast(vac.new_vaccinations as bigint)) over (Partition by dea.location order by dea.location, dea.date) as RollingPeopleVaccinated
-from PortfolioProject..CovidDeaths dea
-Join PortfolioProject..CovidVaccinations vac
-on dea.location = vac.location
-and dea.date = vac.date
-where dea.continent is not null
---order by 2,3
-)
-select *, (RollingPeopleVaccinated/population)*100
-from PopvsVac
 
 
-
-
-
--- TEMP Table
+-- Using Temp Table to perform Calculation on Partition By in previous query
 
 
 drop table if exists #PercentPopulationVaccinated
