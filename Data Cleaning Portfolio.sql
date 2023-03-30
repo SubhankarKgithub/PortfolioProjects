@@ -54,8 +54,7 @@ where a.PropertyAddress is null
 
 select PropertyAddress
 from PortfolioProject.dbo.NashvilleHousing
---where PropertyAddress is null
---order by ParcelID
+
 
 select 
 substring(PropertyAddress, 1, CHARINDEX(',',PropertyAddress) -1) as Address
@@ -155,12 +154,12 @@ PARTITION BY ParcelID,
 			  ) row_num
 
 from PortfolioProject.dbo.NashvilleHousing
---order by ParcelID
+
 )
 delete
 from RowNumCTE
 where row_num > 1
---order by PropertyAddress
+
 
 -----------------------------------------------------------------------------------------------------------------------------------
 
